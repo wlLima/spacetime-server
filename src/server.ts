@@ -4,8 +4,19 @@ import jwt from '@fastify/jwt'
 import cors from '@fastify/cors'
 import { memoriesRoutes } from './routes/memories'
 import { authRoutes } from './routes/auth'
+import { uploadRoutes } from './routes/upload'
+import multipart from '@fastify/multipart'
+import { resolve } from 'path'
 
 const app = fastify()
+
+app.register(multipart)
+
+app.register(require('@fastify/static'), {
+  root: resolve(__dirname, '../uploads'),
+  prefix: '/uploads',
+})
+
 app.register(cors, {
   origin: true,
 })
@@ -13,8 +24,9 @@ app.register(jwt, {
   secret: `${process.env.JWT_SECRET}`,
 })
 
-app.register(memoriesRoutes)
 app.register(authRoutes)
+app.register(uploadRoutes)
+app.register(memoriesRoutes)
 
 app
   .listen({
